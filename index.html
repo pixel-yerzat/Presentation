@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SmartCity AI Platform - Hackathon 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg-dark: #0a0e1a;
+        --bg-light: #0f1420;
+        --accent-dispatch: #ff6b35;
+        --accent-traffic: #00ff9d;
+        --accent-blue: #4a9eff;
+        --text-primary: #ffffff;
+        --text-secondary: #a0a8b8;
+        --glass-bg: rgba(255, 255, 255, 0.05);
+        --glass-border: rgba(255, 255, 255, 0.1);
+      }
+
+      body {
+        font-family: "Syne", sans-serif;
+        background: var(--bg-dark);
+        color: var(--text-primary);
+        overflow-x: hidden;
+        line-height: 1.6;
+      }
+
+      .bg-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        opacity: 0.4;
+      }
+
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        backdrop-filter: blur(20px);
+        background: rgba(10, 14, 26, 0.8);
+        border-bottom: 1px solid var(--glass-border);
+        transition: all 0.3s ease;
+      }
+
+      nav.scrolled {
+        padding: 0.5rem 0;
+        background: rgba(10, 14, 26, 0.95);
+      }
+
+      .nav-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 1.5rem 3rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+        font-weight: 800;
+        background: linear-gradient(
+          135deg,
+          var(--accent-traffic),
+          var(--accent-dispatch)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 3rem;
+        list-style: none;
+      }
+
+      .nav-links a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.95rem;
+        transition: color 0.3s ease;
+        letter-spacing: 0.02em;
+      }
+
+      .nav-links a:hover {
+        color: var(--text-primary);
+      }
+
+      .progress-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 3px;
+        background: linear-gradient(
+          90deg,
+          var(--accent-traffic),
+          var(--accent-dispatch)
+        );
+        z-index: 1001;
+        transform-origin: left;
+        transform: scaleX(0);
+        transition: transform 0.1s ease;
+      }
+
+      .hero {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        padding: 8rem 2rem;
+        overflow: hidden;
+      }
+
+      .hero-content {
+        text-align: center;
+        max-width: 1200px;
+        position: relative;
+        z-index: 10;
+        animation: fadeInUp 1s ease;
+      }
+
+      .hero h1 {
+        font-size: clamp(3rem, 8vw, 7rem);
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        line-height: 1.1;
+        letter-spacing: -0.03em;
+      }
+
+      .hero .subtitle {
+        font-size: clamp(1.2rem, 3vw, 2rem);
+        color: var(--text-secondary);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+
+      .hero .description {
+        font-size: clamp(1rem, 2vw, 1.25rem);
+        color: var(--text-secondary);
+        margin-bottom: 3rem;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+        font-weight: 400;
+      }
+
+      .cta-buttons {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        padding: 1.2rem 2.5rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        text-decoration: none;
+        display: inline-block;
+        font-family: "Syne", sans-serif;
+        letter-spacing: 0.02em;
+      }
+
+      .btn-dispatch {
+        background: var(--accent-dispatch);
+        color: white;
+        box-shadow: 0 10px 40px rgba(255, 107, 53, 0.3);
+      }
+
+      .btn-dispatch:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 15px 60px rgba(255, 107, 53, 0.5);
+      }
+
+      .btn-traffic {
+        background: var(--accent-traffic);
+        color: var(--bg-dark);
+        box-shadow: 0 10px 40px rgba(0, 255, 157, 0.3);
+      }
+
+      .btn-traffic:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 15px 60px rgba(0, 255, 157, 0.5);
+      }
+
+      section {
+        position: relative;
+        z-index: 10;
+        padding: 8rem 2rem;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .section-content {
+        max-width: 1400px;
+        width: 100%;
+      }
+
+      .section-title {
+        font-size: clamp(2.5rem, 5vw, 4.5rem);
+        font-weight: 800;
+        margin-bottom: 3rem;
+        text-align: center;
+        letter-spacing: -0.02em;
+      }
+
+      .problem-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 30px;
+        padding: 3rem;
+        transition: all 0.5s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .problem-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(
+          90deg,
+          var(--accent-dispatch),
+          var(--accent-traffic)
+        );
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .problem-card:hover::before {
+        opacity: 1;
+      }
+
+      .problem-card h3 {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+        font-weight: 700;
+      }
+
+      .problem-visual {
+        width: 100%;
+        height: 200px;
+        background: rgba(255, 0, 0, 0.1);
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .problem-visual::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 10px;
+        height: 10px;
+        background: red;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+      }
+
+      .platform-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 30px;
+        padding: 3rem;
+        cursor: pointer;
+        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .platform-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          135deg,
+          var(--accent-dispatch) 0%,
+          var(--accent-traffic) 100%
+        );
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: -1;
+      }
+
+      .platform-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        border-color: transparent;
+      }
+
+      .platform-card:hover::before {
+        opacity: 0.1;
+      }
+
+      .card-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(
+          135deg,
+          var(--accent-dispatch),
+          var(--accent-traffic)
+        );
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .card-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+      }
+
+      .card-tagline {
+        font-size: 1.2rem;
+        color: var(--accent-traffic);
+        margin-bottom: 2rem;
+        font-weight: 600;
+      }
+
+      .card-features {
+        list-style: none;
+        margin-top: 2rem;
+      }
+
+      .card-features li {
+        padding: 0.8rem 0;
+        border-bottom: 1px solid var(--glass-border);
+        color: var(--text-secondary);
+        font-size: 1.05rem;
+        transition: all 0.3s ease;
+      }
+
+      .card-features li:hover {
+        color: var(--text-primary);
+        padding-left: 1rem;
+      }
+
+      .card-features li::before {
+        content: "→";
+        margin-right: 1rem;
+        color: var(--accent-traffic);
+      }
+
+      .tech-carousel {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-top: 4rem;
+      }
+
+      .tech-item {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        padding: 2.5rem;
+        text-align: center;
+        transition: all 0.4s ease;
+      }
+
+      .tech-item:hover {
+        transform: translateY(-8px);
+        border-color: var(--accent-traffic);
+        box-shadow: 0 20px 60px rgba(0, 255, 157, 0.2);
+      }
+
+      .tech-item h4 {
+        font-size: 1.4rem;
+        margin-bottom: 1rem;
+        color: var(--accent-traffic);
+      }
+
+      .tech-item p {
+        color: var(--text-secondary);
+        font-size: 1rem;
+      }
+
+      .workflow-container {
+        margin-top: 4rem;
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 30px;
+        padding: 3rem;
+      }
+
+      .workflow-step {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 2rem;
+        margin-bottom: 3rem;
+        align-items: start;
+      }
+
+      .step-number {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, var(--accent-traffic), var(--accent-dispatch));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: 800;
+        flex-shrink: 0;
+      }
+
+      .step-content {
+        padding-top: 0.5rem;
+      }
+
+      .step-content h4 {
+        font-size: 1.5rem;
+        margin-bottom: 0.8rem;
+        color: var(--accent-traffic);
+      }
+
+      .step-content p {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        line-height: 1.7;
+      }
+
+      .code-block {
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 1rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.9rem;
+        overflow-x: auto;
+      }
+
+      .code-line {
+        color: var(--text-secondary);
+        margin: 0.3rem 0;
+      }
+
+      .code-comment {
+        color: #6b7280;
+      }
+
+      .code-keyword {
+        color: var(--accent-traffic);
+      }
+
+      .code-string {
+        color: var(--accent-dispatch);
+      }
+
+      .impact-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-top: 4rem;
+      }
+
+      .impact-card {
+        text-align: center;
+        padding: 3rem;
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        transition: all 0.4s ease;
+      }
+
+      .impact-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 30px 80px rgba(0, 255, 157, 0.3);
+      }
+
+      .impact-number {
+        font-size: 4rem;
+        font-weight: 800;
+        background: linear-gradient(
+          135deg,
+          var(--accent-traffic),
+          var(--accent-dispatch)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      .impact-label {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+      }
+
+      .demo-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 3rem;
+        margin-top: 4rem;
+      }
+
+      .demo-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 30px;
+        padding: 3rem;
+        text-align: center;
+      }
+
+      .demo-card h3 {
+        font-size: 1.8rem;
+        margin-bottom: 2rem;
+      }
+
+      .demo-preview {
+        overflow: hidden;
+        border: 2px solid rgba(255, 107, 53, 0.8);
+        width: 100%;
+        height: 300px;
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 20px;
+        margin-bottom: 2rem;
+      }
+
+      .demo-preview iframe {
+        width: 1920px;
+        height: 1080px;
+        border: none;
+        transform-origin: 0 0;
+        z-index: 10;
+        transform: scale(0.31);
+      }
+
+      .architecture-diagram {
+        margin-top: 4rem;
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 30px;
+        padding: 3rem;
+      }
+
+      .arch-layer {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border-left: 4px solid var(--accent-traffic);
+      }
+
+      .arch-layer h4 {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        color: var(--accent-traffic);
+      }
+
+      .arch-components {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+      }
+
+      .arch-component {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 1rem;
+        border-radius: 10px;
+        text-align: center;
+        border: 1px solid var(--glass-border);
+      }
+
+      .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+      }
+
+      .team-member {
+        text-align: center;
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        padding: 2rem;
+        transition: all 0.3s ease;
+      }
+
+      .team-member:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 60px rgba(0, 255, 157, 0.2);
+      }
+
+      .member-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        margin: 0 auto 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--accent-traffic), var(--accent-dispatch));
+      }
+
+      .tech-badge {
+        display: inline-block;
+        padding: 0.4rem 1rem;
+        background: rgba(0, 255, 157, 0.1);
+        border: 1px solid rgba(0, 255, 157, 0.3);
+        border-radius: 20px;
+        font-size: 0.85rem;
+        margin: 0.3rem;
+        color: var(--accent-traffic);
+      }
+
+      footer {
+        background: var(--bg-light);
+        padding: 4rem 2rem 2rem;
+        text-align: center;
+        border-top: 1px solid var(--glass-border);
+      }
+
+      .footer-tagline {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 2rem;
+      }
+
+      .footer-links {
+        display: flex;
+        justify-content: center;
+        gap: 3rem;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+      }
+
+      .footer-links a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: color 0.3s ease;
+      }
+
+      .footer-links a:hover {
+        color: var(--accent-traffic);
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(40px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(3);
+          opacity: 0;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .nav-content {
+          padding: 1rem 1.5rem;
+        }
+
+        .nav-links {
+          display: none;
+        }
+
+        section {
+          padding: 4rem 1.5rem;
+        }
+
+        .hero {
+          padding: 6rem 1.5rem;
+        }
+
+        .cta-buttons {
+          flex-direction: column;
+          width: 100%;
+        }
+
+        .btn {
+          width: 100%;
+        }
+
+        .workflow-step {
+          grid-template-columns: 1fr;
+        }
+
+        .demo-container {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas class="bg-canvas" id="bgCanvas"></canvas>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <nav id="nav">
+      <div class="nav-content">
+        <div class="logo">SmartCity AI</div>
+        <ul class="nav-links">
+          <li><a href="#platform">Платформа</a></li>
+          <li><a href="#dispatch">SmartDispatch</a></li>
+          <li><a href="#traffic">SmartTraffic</a></li>
+          <li><a href="#demo">Демо</a></li>
+          <li><a href="#team">Команда</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-content">
+        <h1>SmartCity AI Platform</h1>
+        <div class="subtitle">
+          Один интеллект. Тысячи решений. Миллионы улучшенных жизней.
+        </div>
+        <p class="description">
+          Экосистема AI-решений для умных городов и эффективных предприятий
+        </p>
+        <div class="cta-buttons">
+          <a href="#dispatch" class="btn btn-dispatch">SmartDispatch AI</a>
+          <a href="#traffic" class="btn btn-traffic">SmartTraffic AI</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- SMARTDISPATCH PROJECT -->
+    <section id="dispatch" style="background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-light) 100%); padding-top: 10rem;">
+      <div class="section-content">
+        <div style="text-align: center; margin-bottom: 3rem">
+          <div style="display: inline-block; padding: 0.8rem 2rem; background: rgba(255, 107, 53, 0.1); border: 1px solid var(--accent-dispatch); border-radius: 50px; margin-bottom: 2rem;">
+            <span style="color: var(--accent-dispatch); font-weight: 600; font-size: 1.1rem;">Проект 1</span>
+          </div>
+        </div>
+        <h2 class="section-title" style="font-size: clamp(3rem, 6vw, 5rem)">
+          <span style="color: var(--accent-dispatch)">⚙️</span> SmartDispatch AI
+        </h2>
+        <p style="text-align: center; font-size: 1.8rem; color: var(--accent-dispatch); font-weight: 600; margin-bottom: 2rem;">
+          Интеллектуальное управление заявками на производстве
+        </p>
+      </div>
+    </section>
+
+    <!-- SmartDispatch Problem & Solution -->
+    <section>
+      <div class="section-content">
+        <h2 class="section-title">Проблема и Решение</h2>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-bottom: 4rem;">
+          <!-- Problem -->
+          <div class="problem-card">
+            <h3 style="color: #ef4444;">❌ Текущая ситуация</h3>
+            <ul style="list-style: none; padding: 0; margin-top: 2rem;">
+              <li style="padding: 1rem 0; border-bottom: 1px solid var(--glass-border); color: var(--text-secondary);">
+                Критические заявки теряются в потоке
+              </li>
+              <li style="padding: 1rem 0; border-bottom: 1px solid var(--glass-border); color: var(--text-secondary);">
+                Ручная обработка занимает 15+ минут
+              </li>
+              <li style="padding: 1rem 0; border-bottom: 1px solid var(--glass-border); color: var(--text-secondary);">
+                Неравномерная нагрузка на инженеров
+              </li>
+              <li style="padding: 1rem 0; color: var(--text-secondary);">
+                Нет предиктивного обслуживания
+              </li>
+            </ul>
+          </div>
+
+          <!-- Solution -->
+          <div class="problem-card" style="border: 2px solid var(--accent-dispatch);">
+            <h3 style="color: var(--accent-dispatch);">✅ SmartDispatch AI</h3>
+            <ul style="list-style: none; padding: 0; margin-top: 2rem;">
+              <li style="padding: 1rem 0; border-bottom: 1px solid var(--glass-border); color: var(--text-primary);">
+                ⚡ Анализ заявки за 2 секунды
+              </li>
+              <li style="padding: 1rem 0; border-bottom: 1px solid var(--glass-border); color: var(--text-primary);">
+                🎯 Автоматическое назначение по AI
+              </li>
+              <li style="padding: 1rem 0; border-bottom: 1px solid var(--glass-border); color: var(--text-primary);">
+                📊 Умная балансировка нагрузки
+              </li>
+              <li style="padding: 1rem 0; color: var(--text-primary);">
+                🔮 Предсказание поломок
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- How it Works -->
+        <div class="workflow-container">
+          <h3 style="font-size: 2.5rem; margin-bottom: 3rem; text-align: center; color: var(--accent-dispatch);">
+            Как это работает
+          </h3>
+
+          <div class="workflow-step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h4>Создание заявки</h4>
+              <p>Оператор описывает проблему обычным языком: "Сломался станок ЧПУ №5, не запускается"</p>
+              <div class="code-block">
+                <div class="code-line"><span class="code-keyword">POST</span> /api/requests</div>
+                <div class="code-line">{ <span class="code-string">"description"</span>: <span class="code-string">"Сломался станок ЧПУ №5"</span> }</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="workflow-step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h4>AI Анализ (GPT-4)</h4>
+              <p>Система анализирует текст, извлекает ключевую информацию и определяет категорию, приоритет и срочность</p>
+              <div class="code-block">
+                <div class="code-line"><span class="code-comment"># Natural Language Processing</span></div>
+                <div class="code-line"><span class="code-keyword">category</span> = <span class="code-string">"mechanical"</span></div>
+                <div class="code-line"><span class="code-keyword">priority</span> = <span class="code-string">"high"</span> <span class="code-comment"># 85/100</span></div>
+                <div class="code-line"><span class="code-keyword">equipment</span> = <span class="code-string">"CNC Machine #5"</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="workflow-step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h4>Умное назначение</h4>
+              <p>ML алгоритм выбирает оптимального исполнителя на основе навыков, загрузки и локации</p>
+              <div class="code-block">
+                <div class="code-line"><span class="code-comment"># Smart Assignment Algorithm</span></div>
+                <div class="code-line"><span class="code-keyword">best_engineer</span> = find_optimal_match(</div>
+                <div class="code-line">  skills=["mechanical", "CNC"],</div>
+                <div class="code-line">  current_load=2, <span class="code-comment"># tasks</span></div>
+                <div class="code-line">  location="workshop_A"</div>
+                <div class="code-line">)</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="workflow-step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+              <h4>Выполнение и Аналитика</h4>
+              <p>Инженер получает задачу, решает проблему, система собирает данные для предиктивного обслуживания</p>
+              <div class="code-block">
+                <div class="code-line"><span class="code-keyword">status</span>: <span class="code-string">"completed"</span></div>
+                <div class="code-line"><span class="code-keyword">resolution_time</span>: <span class="code-string">"45 min"</span></div>
+                <div class="code-line"><span class="code-comment"># ML learns patterns for future predictions</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SmartDispatch Tech Stack -->
+    <section style="background: var(--bg-light)">
+      <div class="section-content">
+        <h2 class="section-title">Технологии SmartDispatch</h2>
+
+        <div class="architecture-diagram">
+          <div class="arch-layer">
+            <h4>🧠 AI Layer</h4>
+            <div class="arch-components">
+              <div class="arch-component">
+                <strong>GPT-4 API</strong>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">Text Analysis</p>
+              </div>
+              <div class="arch-component">
+                <strong>TensorFlow</strong>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">ML Models</p>
+              </div>
+              <div class="arch-component">
+                <strong>scikit-learn</strong>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">Classification</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="arch-layer">
+            <h4>⚙️ Backend</h4>
+            <div class="arch-components">
+              <div class="arch-component">
+                <strong>FastAPI</strong>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">REST API</p>
+              </div>
+              <div class="arch-component">
+                <strong>WebSocket</strong>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">Real-time</p>
+              </div>
+              <div class="arch-component">
+                <strong>Celery</strong>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">Task Queue</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="arch-layer">
+            <h4>💾 Data Layer</h4>
+            <div class="arch-components">
+              <div class="arch-component">
+                <strong>PostgreSQL</strong>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">Main DB</p>
+              </div>
+              <div class="arch-component">
+                <strong>Redis</strong>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">Cache</p>
+              </div>
+              <div class="arch-component">
+                <strong>MongoDB</strong>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">Analytics</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="arch-layer">
+            <h4>💻 Frontend</h4>
+            <div class="arch-components">
+              <div class="arch-component">
+                <strong>React</strong>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">Web UI</p>
+              </div>
+              <div class="arch-component">
+                <strong>React Native</strong>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">Mobile</p>
+              </div>
+              <div class="arch-component">
+                <strong>TailwindCSS</strong>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">Styling</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SmartDispatch Results -->
+    <section>
+      <div class="section-content">
+        <h2 class="section-title">Результаты SmartDispatch</h2>
+
+        <div class="impact-grid">
+          <div class="impact-card" style="border-color: var(--accent-dispatch);">
+            <div class="impact-number" style="background: linear-gradient(135deg, var(--accent-dispatch), #ff8c5a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+              2s
+            </div>
+            <div class="impact-label">Анализ заявки</div>
+          </div>
+          <div class="impact-card" style="border-color: var(--accent-dispatch);">
+            <div class="impact-number" style="background: linear-gradient(135deg, var(--accent-dispatch), #ff8c5a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+              94%
+            </div>
+            <div class="impact-label">Точность AI</div>
+          </div>
+          <div class="impact-card" style="border-color: var(--accent-dispatch);">
+            <div class="impact-number" style="background: linear-gradient(135deg, var(--accent-dispatch), #ff8c5a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+              -60%
+            </div>
+            <div class="impact-label">Время простоя</div>
+          </div>
+          <div class="impact-card" style="border-color: var(--accent-dispatch);">
+            <div class="impact-number" style="background: linear-gradient(135deg, var(--accent-dispatch), #ff8c5a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+              24/7
+            </div>
+            <div class="impact-label">Работа системы</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SMARTTRAFFIC PROJECT -->
+    <section id="traffic" style="background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-light) 100%); padding-top: 10rem;">
+      <div class="section-content">
+        <div style="text-align: center; margin-bottom: 3rem">
+          <div style="display: inline-block; padding: 0.8rem 2rem; background: rgba(0, 255, 157, 0.1); border: 1px solid var(--accent-traffic); border-radius: 50px; margin-bottom: 2rem;">
+            <span style="color: var(--accent-traffic); font-weight: 600; font-size: 1.1rem;">Проект 2</span>
+          </div>
+        </div>
+        <h2 class="section-title" style="font-size: clamp(3rem, 6vw, 5rem)">
+          <span style="color: var(--accent-traffic)">🚦</span> SmartTraffic AI
+        </h2>
+        <p style="text-align: center; font-size: 1.8rem; color: var(--accent-traffic); font-weight: 600; margin-bottom: 2rem;">
+          Адаптивное управление городским трафиком
+        </p>
+      </div>
+    </section>
+
+    <!-- SmartTraffic Problem & Solution -->
+    <section>
+      <div class="section-content">
+        <h2 class="section-title">Проблема и Решение</h2>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-bottom: 4rem;">
+          <!-- Problem -->
+          <div class="problem-card">
+            <h3 style="color: #ef4444;">❌ Текущая ситуация</h3>
+            <ul style="list-style: none; padding: 0; margin-top: 2rem;">
+              <li style="padding: 1rem 0; border-bottom: 1px solid var(--glass-border); color: var(--text-secondary);">
+                Статичные светофоры не адаптируются
+              </li>
+              <li style="padding: 1rem 0; border-bottom: 1px solid var(--glass-border); color: var(--text-secondary);">
+                Скорая помощь застревает в пробках
+              </li>
+              <li style="padding: 1rem 0; border-bottom: 1px solid var(--glass-border); color: var(--text-secondary);">
+                Нет прогнозирования потоков
+              </li>
+              <li style="padding: 1rem 0; color: var(--text-secondary);">
+                Высокие выбросы CO₂
+              </li>
+            </ul>
+          </div>
+
+          <!-- Solution -->
+          <div class="problem-card" style="border: 2px solid var(--accent-traffic);">
+            <h3 style="color: var(--accent-traffic);">✅ SmartTraffic AI</h3>
+            <ul style="list-style: none; padding: 0; margin-top: 2rem;">
+              <li style="padding: 1rem 0; border-bottom: 1px solid var(--glass-border); color: var(--text-primary);">
+                🎥 Computer Vision анализ потока
+              </li>
+              <li style="padding: 1rem 0; border-bottom: 1px solid var(--glass-border); color: var(--text-primary);">
+                🚑 Зеленый коридор для скорой
+              </li>
+              <li style="padding: 1rem 0; border-bottom: 1px solid var(--glass-border); color: var(--text-primary);">
+                📊 Прогноз на 15 минут вперед
+              </li>
+              <li style="padding: 1rem 0; color: var(--text-primary);">
+                🌱 Снижение выбросов на 25%
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- How it Works -->
+        <div class="workflow-container">
+          <h3 style="font-size: 2.5rem; margin-bottom: 3rem; text-align: center; color: var(--accent-traffic);">
+            Как это работает
+          </h3>
+
+          <div class="workflow-step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h4>Видеоанализ в реальном времени</h4>
+              <p>Камеры на перекрестке захватывают видеопоток, Computer Vision подсчитывает автомобили</p>
+              <div class="code-block">
+                <div class="code-line"><span class="code-comment"># YOLO Object Detection</span></div>
+                <div class="code-line"><span class="code-keyword">vehicles</span> = detect_vehicles(video_stream)</div>
+                <div class="code-line"><span class="code-keyword">count</span> = len(vehicles) <span class="code-comment"># 47 cars</span></div>
+                <div class="code-line"><span class="code-keyword">flow_rate</span> = calculate_flow(count)</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="workflow-step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h4>Адаптация светофоров</h4>
+              <p>AI анализирует загрузку всех направлений и динамически меняет длительность фаз</p>
+              <div class="code-block">
+                <div class="code-line"><span class="code-keyword">north_flow</span> = 47 <span class="code-comment"># high</span></div>
+                <div class="code-line"><span class="code-keyword">south_flow</span> = 12 <span class="code-comment"># low</span></div>
+                <div class="code-line"><span class="code-keyword">green_time</span> = optimize_phases(flows)</div>
+                <div class="code-line"><span class="code-comment"># North: 60s, South: 30s</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="workflow-step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h4>Детекция экстренных служб</h4>
+              <p>CV распознает машины скорой помощи и автоматически открывает зеленый коридор</p>
+              <div class="code-block">
+                <div class="code-line"><span class="code-keyword">if</span> detect_emergency(frame):</div>
+                <div class="code-line">  activate_green_corridor()</div>
+                <div class="code-line">  notify_next_intersections()</div>
+                <div class="code-line">  <span class="code-comment"># Response time: 3 seconds</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="workflow-step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+              <h4>Прогнозирование и оптимизация</h4>
+              <p>ML модель предсказывает пробки на основе исторических данных и текущих паттернов</p>
+              <div class="code-block">
+                <div class="code-line"><span class="code-comment"># LSTM Neural Network</span></div>
+                <div class="code-line"><span class="code-keyword">prediction</span> = model.predict(</div>
+                <div class="code-line">  current_flow, time_of_day, weather</div>
+                <div class="code-line">)</div>
+                <div class="code-line"><span class="code-comment"># Congestion in 15 min: 78% probability</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SmartTraffic Tech Stack -->
+    <section style="background: var(--bg-light)">
+      <div class="section-content">
+        <h2 class="section-title">Технологии SmartTraffic</h2>
+
+        <div class="architecture-diagram">
+          <div class="arch-layer">
+            <h4>👁️ Computer Vision</h4>
+            <div class="arch-components">
+              <div class="arch-component">
+                <strong>YOLO v8</strong>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">Object Detection</p>
+              </div>
+              <div class="arch-component">
+                <strong>OpenCV</strong>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">Image Processing</p>
+              </div>
+              <div class="arch-component">
+                <strong>DeepSORT</strong>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">Vehicle Tracking</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="arch-layer">
+            <h4>🧠 Machine Learning</h4>
+            <div class="arch-components">
+              <div class="arch-component">
+                <strong>TensorFlow</strong>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">Neural Networks</p>
+              </div>
+              <div class="arch-component">
+                <strong>LSTM</strong>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">Time Series</p>
+              </div>
+              <div class="arch-component">
+                <strong>Reinforcement Learning</strong>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">Optimization</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="arch-layer">
+            <h4>⚡ Edge Computing</h4>
+            <div class="arch-components">
+              <div class="arch-component">
+                <strong>Jetson Nano</strong>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">On-device AI</p>
+              </div>
+              <div class="arch-component">
+                <strong>MQTT</strong>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">IoT Protocol</p>
+              </div>
+              <div class="arch-component">
+                <strong>Redis Streams</strong>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">Real-time Data</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="arch-layer">
+            <h4>🎛️ Control System</h4>
+            <div class="arch-components">
+              <div class="arch-component">
+                <strong>PLC Integration</strong>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">Traffic Lights</p>
+              </div>
+              <div class="arch-component">
+                <strong>WebSocket</strong>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">Live Updates</p>
+              </div>
+              <div class="arch-component">
+                <strong>FastAPI</strong>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">REST API</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SmartTraffic Results -->
+    <section>
+      <div class="section-content">
+        <h2 class="section-title">Результаты SmartTraffic</h2>
+
+        <div class="impact-grid">
+          <div class="impact-card" style="border-color: var(--accent-traffic);">
+            <div class="impact-number" style="background: linear-gradient(135deg, var(--accent-traffic), #00cc7a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+              -40%
+            </div>
+            <div class="impact-label">Время в пробках</div>
+          </div>
+          <div class="impact-card" style="border-color: var(--accent-traffic);">
+            <div class="impact-number" style="background: linear-gradient(135deg, var(--accent-traffic), #00cc7a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+              3s
+            </div>
+            <div class="impact-label">Реакция на скорую</div>
+          </div>
+          <div class="impact-card" style="border-color: var(--accent-traffic);">
+            <div class="impact-number" style="background: linear-gradient(135deg, var(--accent-traffic), #00cc7a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+              -25%
+            </div>
+            <div class="impact-label">Выбросы CO₂</div>
+          </div>
+          <div class="impact-card" style="border-color: var(--accent-traffic);">
+            <div class="impact-number" style="background: linear-gradient(135deg, var(--accent-traffic), #00cc7a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+              +35%
+            </div>
+            <div class="impact-label">Скорость потока</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section id="demo" style="background: var(--bg-light);">
+      <div class="section-content">
+        <h2 class="section-title">Live Demo</h2>
+
+        <div class="demo-container">
+          <div class="demo-card">
+            <h3>SmartDispatch Demo</h3>
+            <div class="demo-preview" style="border-color: var(--accent-dispatch);">
+              <iframe src="https://smartdispatch-ai.web.app"></iframe>
+            </div>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem">
+              Создайте заявку и увидьте AI-анализ в действии
+            </p>
+            <a href="https://smartdispatch-ai.web.app/" class="btn btn-dispatch">Запустить</a>
+          </div>
+
+          <div class="demo-card">
+            <h3>SmartTraffic Demo</h3>
+            <div class="demo-preview" style="border-color: var(--accent-traffic);">
+              <iframe src="http://localhost:8080"></iframe>
+            </div>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem">
+              Управляйте виртуальным перекрестком
+            </p>
+            <a href="http://localhost:8080" class="btn btn-traffic">Запустить</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Team Section -->
+    <section id="team">
+      <div class="section-content">
+        <h2 class="section-title">Команда</h2>
+
+        <div class="team-grid">
+          <div class="team-member">
+            <div class="member-avatar">А</div>
+            <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Сейдазимов Айбек</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">Python Developer</p>
+            <div>
+              <span class="tech-badge">Python</span>
+              <span class="tech-badge">FastAPI</span>
+              <span class="tech-badge">AI/ML</span>
+            </div>
+          </div>
+
+          <div class="team-member">
+            <div class="member-avatar">Е</div>
+            <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Пазылханов Ерзат</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">Fullstack Developer</p>
+            <div>
+              <span class="tech-badge">React</span>
+              <span class="tech-badge">FastAPI</span>
+              <span class="tech-badge">DevOps</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 4rem;">
+          <h3 style="font-size: 2rem; margin-bottom: 2rem;">Спасибо за внимание! 🚀</h3>
+          <div style="display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap;">
+            <a href="https://github.com" style="color: var(--text-secondary); text-decoration: none; transition: color 0.3s;">📂 GitHub</a>
+            <a href="#demo" style="color: var(--text-secondary); text-decoration: none; transition: color 0.3s;">📊 Demo</a>
+            <a href="mailto:team@smartcity.ai" style="color: var(--text-secondary); text-decoration: none; transition: color 0.3s;">📧 Contact</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-tagline">Tech QyzpuNigde Hackathon 2025</div>
+      <div class="footer-links">
+        <a href="#">AI and Working Professions</a>
+        <a href="#">SmartDispatch AI</a>
+        <a href="#">SmartTraffic AI</a>
+      </div>
+      <p style="color: var(--text-secondary); margin-top: 2rem">
+        © 2025 SmartCity AI Platform
+      </p>
+    </footer>
+
+    <script>
+      // Progress Bar
+      window.addEventListener("scroll", () => {
+        const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = winScroll / height;
+        document.getElementById("progressBar").style.transform = `scaleX(${scrolled})`;
+      });
+
+      // Nav Scroll Effect
+      window.addEventListener("scroll", () => {
+        const nav = document.getElementById("nav");
+        if (window.scrollY > 100) {
+          nav.classList.add("scrolled");
+        } else {
+          nav.classList.remove("scrolled");
+        }
+      });
+
+      // Smooth Scroll
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute("href"));
+          if (target) {
+            target.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        });
+      });
+
+      // Animated Background
+      const canvas = document.getElementById("bgCanvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const particles = [];
+      const particleCount = 100;
+
+      class Particle {
+        constructor() {
+          this.x = Math.random() * canvas.width;
+          this.y = Math.random() * canvas.height;
+          this.size = Math.random() * 2 + 1;
+          this.speedX = Math.random() * 0.5 - 0.25;
+          this.speedY = Math.random() * 0.5 - 0.25;
+          this.color = Math.random() > 0.5 ? "rgba(0, 255, 157, 0.5)" : "rgba(255, 107, 53, 0.5)";
+        }
+
+        update() {
+          this.x += this.speedX;
+          this.y += this.speedY;
+          if (this.x > canvas.width) this.x = 0;
+          if (this.x < 0) this.x = canvas.width;
+          if (this.y > canvas.height) this.y = 0;
+          if (this.y < 0) this.y = canvas.height;
+        }
+
+        draw() {
+          ctx.fillStyle = this.color;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      for (let i = 0; i < particleCount; i++) {
+        particles.push(new Particle());
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach((particle) => {
+          particle.update();
+          particle.draw();
+        });
+
+        particles.forEach((particle1, index) => {
+          particles.slice(index + 1).forEach((particle2) => {
+            const dx = particle1.x - particle2.x;
+            const dy = particle1.y - particle2.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance < 150) {
+              ctx.strokeStyle = `rgba(0, 255, 157, ${0.2 * (1 - distance / 150)})`;
+              ctx.lineWidth = 0.5;
+              ctx.beginPath();
+              ctx.moveTo(particle1.x, particle1.y);
+              ctx.lineTo(particle2.x, particle2.y);
+              ctx.stroke();
+            }
+          });
+        });
+
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+
+      window.addEventListener("resize", () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      });
+
+      // Intersection Observer
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: "0px 0px -100px 0px",
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.style.animation = "fadeInUp 0.8s ease forwards";
+          }
+        });
+      }, observerOptions);
+
+      document.querySelectorAll(".section-content").forEach((el) => {
+        observer.observe(el);
+      });
+    </script>
+  </body>
+</html>
